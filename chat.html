@@ -1,0 +1,115 @@
+<html>
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+	<title>WebSoecktで作るチャット</title>
+	<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1/jquery.min.js"></script>
+	<script>
+$(document).ready(function(){
+	//サーバと同じポートを指定しなければいけません。(10080以外のポートを使っている人はここの値を変えてください)
+	var port = 10080;
+
+	console.log("ready");
+	var ws = new WebSocket('ws://192.168.111.200:'+port+'/',["chat"]);
+	$("#voice").submit(function(){
+		if($("#name").val()==""){
+			$("#name").val("匿名さん"+Math.round(Math.random()*1000));
+		}
+		if($("#message").val() == ""){
+			return false;
+		}
+		var date = new Date();
+		date = date.getFullYear() +"年"+date.getMonth()+"月"+date.getDate()+"日　"+date.getHours()+"時"+date.getMinutes()+"分"+date.getSeconds()+"秒";
+		var msg = {
+			"name":$("#name").val(),
+			"message":$("#message").val(),
+			"time":date
+		};
+		console.log("I said '"+$("#message").val()+"'");
+		$("#message").val("");
+		$("#message").focus();
+		ws.send(JSON.stringify(msg));
+		return false;
+	});
+	ws.onmessage = function(event) {
+		var data = JSON.parse(event.data);
+		$("#chat").after("<tr><td>"+data["name"]+"</td><td>"+data["message"]+"</td><td>"+data["time"]+"</td></tr>");
+	}
+});
+
+	</script>
+	<style>
+table {
+  width: auto;
+  border-spacing: 0;
+  font-size:14px;
+}
+table th {
+  color: #fff;
+  padding: 8px 15px;
+  background: #258;
+  background:-moz-linear-gradient(rgba(34,85,136,0.7), rgba(34,85,136,0.9) 50%);
+  background:-webkit-gradient(linear, 100% 0%, 100% 50%, from(rgba(34,85,136,0.7)), to(rgba(34,85,136,0.9)));
+  font-weight: bold;
+  border-left:1px solid #258;
+  border-top:1px solid #258;
+  border-bottom:1px solid #258;
+  line-height: 120%;
+  text-align: center;
+  text-shadow:0 -1px 0 rgba(34,85,136,0.9);
+  box-shadow: 0px 1px 1px rgba(255,255,255,0.3) inset;
+}
+table th:first-child {
+  border-radius: 5px 0 0 0;	
+}
+table th:last-child {
+  border-radius:0 5px 0 0;
+  border-right:1px solid #258;
+  box-shadow: 2px 2px 1px rgba(0,0,0,0.1),0px 1px 1px rgba(255,255,255,0.3) inset;
+}
+table tr td {
+  padding: 8px 15px;
+  border-bottom: 1px solid #84b2e0;
+  border-left: 1px solid #84b2e0;
+  text-align: center;
+}
+table tr td:last-child {
+  border-right: 1px solid #84b2e0;
+  box-shadow: 2px 2px 1px rgba(0,0,0,0.1);
+}
+table tr {
+  background: #fff;
+}
+table tr:nth-child(2n+1) {
+  background: #f1f6fc;
+}
+table tr:last-child td {
+  box-shadow: 2px 2px 1px rgba(0,0,0,0.1);
+}
+table tr:last-child td:first-child {
+  border-radius: 0 0 0 5px;
+}
+table tr:last-child td:last-child {
+  border-radius: 0 0 5px 0;
+}
+table tr:hover {
+  background: #bbd4ee;
+  cursor:pointer;
+}
+	</style>
+</head>
+<body>
+	<form action="echo.html" id="voice">
+		名前<input id="name" name="name" size="10" type="text">|
+		発言<input id="message" name="message" size="60" type="text">
+		<input type="submit" value="発言">
+	</form>
+	<hr>
+	<div><table>
+    <tr id="chat">
+      <th>名前</th>
+      <th>発言</th>
+      <th>時刻</th>
+    </tr>
+	</table></div>
+</body>
+</html>
