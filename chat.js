@@ -1,13 +1,16 @@
 var WebSocketServer = require('websocket').server;
 var http = require('http');
 
+//クライアントと同じポートを指定しなければいけません。(10080以外のポートを使っている人はここの値を変えてください)
+var port = 10080;
+
 var server = http.createServer(function(request, response) {
     console.log((new Date()) + ' Received request for ' + request.url);
     response.writeHead(404);
     response.end();
 });
-server.listen(10080, function() {
-    console.log((new Date()) + ' Server is listening on port 10080');
+server.listen(port, function() {
+    console.log((new Date()) + ' Server is listening on port '+port);
 });
 
 wsServer = new WebSocketServer({
